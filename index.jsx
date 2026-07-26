@@ -658,8 +658,17 @@ export default function App({ appId, token }) {
     setSelectedMapId('')
   }, [])
 
-  const openMap = useCallback(async (id) => {
-    if (!id || id === selectedMapId) return
+  const openMap = useCallback(async (id, { ownBackEntry = true } = {}) => {
+    if (!id) return
+    if (!ownBackEntry) {
+      // The shell intent already owns the outer Back entry. Adding an app
+      // sentinel here would make Back stop at the library instead of the chat.
+      try { navRef.current?.close?.() } catch {}
+      navRef.current = null
+      setSelectedMapId(id)
+      return
+    }
+    if (id === selectedMapId) return
     try { navRef.current?.close?.() } catch {}
     const nav = window.mobius?.nav
     if (!nav?.open) {
@@ -700,7 +709,7 @@ export default function App({ appId, token }) {
       if (event.source !== window.parent) return
       if (event.data?.type !== 'moebius:app-intent') return
       const match = /^map:([a-z0-9][a-z0-9-]{0,127})$/.exec(String(event.data.intent || ''))
-      if (match) void openMap(match[1])
+      if (match) void openMap(match[1], { ownBackEntry: false })
     }
     window.addEventListener('message', onIntent)
     return () => window.removeEventListener('message', onIntent)

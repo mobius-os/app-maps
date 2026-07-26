@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 import {
@@ -47,4 +48,13 @@ test('map records keep valid places and reject an unusable record', () => {
   })
   assert.deepEqual(record.places.map((place) => place.id), ['one'])
   assert.equal(normalizeMapRecord({ title: 'Missing identity', places: [] }), null)
+})
+
+test('chat deep links reuse the shell Back entry instead of adding a library stop', async () => {
+  const source = await readFile(new URL('../index.jsx', import.meta.url), 'utf8')
+  assert.match(source, /openMap\(match\[1\], \{ ownBackEntry: false \}\)/)
+  assert.match(
+    source,
+    /if \(!ownBackEntry\) \{[\s\S]*setSelectedMapId\(id\)[\s\S]*return[\s\S]*\}\n    if \(id === selectedMapId\) return/,
+  )
 })
