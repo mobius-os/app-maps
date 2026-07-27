@@ -2,14 +2,14 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowLeft,
   ArrowUpRight,
+  Chat,
   ChevronRight,
-  LocateFixed,
-  Map as MapIcon,
+  Compass,
+  Maps as MapIcon,
+  MapsDirections,
   MapPin,
-  MessageCircle,
-  Navigation,
   Sparkles,
-} from 'lucide-react'
+} from '@openai/apps-sdk-ui/components/Icon'
 import {
   clamp,
   mapPointToPixel,
@@ -47,12 +47,12 @@ function EmptyState() {
 
   return (
     <main className="mb-empty">
-      <div className="mb-empty-icon"><MapIcon size={28} /></div>
+      <div className="mb-empty-icon"><MapIcon width={28} height={28} /></div>
       <p className="mb-kicker">Your map library</p>
       <h1>Put places in perspective.</h1>
       <p>Ask Möbius for a map and it will appear here, linked to the conversation that created it.</p>
       <button type="button" className="mb-primary" onClick={askForMap}>
-        <Sparkles size={18} />
+        <Sparkles width={18} height={18} />
         Ask for a map
       </button>
     </main>
@@ -200,7 +200,7 @@ function MapCard({ record, token, previewPaused, onSelect }) {
         {record.subtitle && <span>{record.subtitle}</span>}
         <small>{cardDate(created)} · {record.area} · {record.places.length} places</small>
       </span>
-      <ChevronRight size={18} aria-hidden="true" />
+      <ChevronRight width={18} height={18} aria-hidden="true" />
     </button>
   )
 }
@@ -558,7 +558,7 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
             top: mapPointToPixel(record.origin, view.center, view.zoom, size).y,
           }}
         >
-          <span><LocateFixed size={15} /></span>
+          <span><Compass width={15} height={15} /></span>
           <strong>{record.origin.label}</strong>
         </div>
 
@@ -606,7 +606,7 @@ function PlacePanel({ record, place, placeNumber }) {
     <aside className="mb-place-panel">
       <div className="mb-place-topline">
         <span className="mb-place-number">{placeNumber}</span>
-        <span className="mb-walk"><Navigation size={14} /> {place.walk}</span>
+        <span className="mb-walk"><MapsDirections width={14} height={14} /> {place.walk}</span>
       </div>
       <div className="mb-place-heading">
         <div>
@@ -616,7 +616,7 @@ function PlacePanel({ record, place, placeNumber }) {
         <span className="mb-price">{place.price}</span>
       </div>
       <p className="mb-place-note">{place.note}</p>
-      <p className="mb-address"><MapPin size={15} /> {place.address}</p>
+      <p className="mb-address"><MapPin width={15} height={15} /> {place.address}</p>
       <div className="mb-actions">
         <a
           className="mb-primary"
@@ -624,9 +624,9 @@ function PlacePanel({ record, place, placeNumber }) {
           target="_blank"
           rel="noreferrer"
         >
-          <Navigation size={17} />
+          <MapsDirections width={17} height={17} />
           Directions
-          <ArrowUpRight size={15} />
+          <ArrowUpRight width={15} height={15} />
         </a>
         <button
           type="button"
@@ -634,7 +634,7 @@ function PlacePanel({ record, place, placeNumber }) {
           onClick={openSourceChat}
           disabled={!record.source_chat?.id}
         >
-          <MessageCircle size={17} />
+          <Chat width={17} height={17} />
           Source chat
         </button>
       </div>
@@ -734,7 +734,7 @@ export default function App({ appId, token }) {
     return (
       <div className="mb-root">
         <style>{CSS}</style>
-        <div className="mb-loading"><MapIcon size={26} /><span>Opening your maps…</span></div>
+        <div className="mb-loading"><MapIcon width={26} height={26} /><span>Opening your maps…</span></div>
       </div>
     )
   }
@@ -780,7 +780,7 @@ export default function App({ appId, token }) {
           onClick={closeMap}
           aria-label="Back to all maps"
         >
-          <ArrowLeft size={19} />
+          <ArrowLeft width={19} height={19} />
         </button>
         <div className="mb-detail-title">
           <p className="mb-kicker">Maps</p>
@@ -793,7 +793,7 @@ export default function App({ appId, token }) {
           onClick={openSourceChat}
           disabled={!selectedMap.source_chat?.id}
         >
-          <MessageCircle size={16} />
+          <Chat width={16} height={16} />
           <span>Source chat</span>
         </button>
       </header>
