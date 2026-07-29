@@ -446,6 +446,10 @@ def parse_overpass_elements(elements, ref_lat=None, ref_lon=None):
                 addr_parts.append(val)
         address_str = ", ".join(addr_parts) if addr_parts else ""
 
+        maps_query = ", ".join(value for value in (name, address_str) if value)
+        if not maps_query:
+            maps_query = f"{el_lat},{el_lon}"
+
         place = {
             "name":     name,
             "address":  address_str,
@@ -453,9 +457,12 @@ def parse_overpass_elements(elements, ref_lat=None, ref_lon=None):
             "lon":      el_lon,
             "osm_type": el.get("type", ""),
             "osm_id":   el.get("id", ""),
-            # Clickable Google Maps link so the agent can render a tap-to-open
-            # URL in chat without composing one downstream.
-            "maps_url": f"https://www.google.com/maps/search/?api=1&query={el_lat},{el_lon}",
+            # Name and address let Google Maps resolve the venue itself rather
+            # than opening an anonymous coordinate pin.
+            "maps_url": (
+                "https://www.google.com/maps/search/?api=1&query="
+                + urllib.parse.quote(maps_query, safe="")
+            ),
             "tags": {
                 k: v for k, v in tags.items()
                 if k not in {"name", "name:en",
@@ -469,10 +476,14 @@ def parse_overpass_elements(elements, ref_lat=None, ref_lon=None):
             ("cuisine",        "cuisine"),
             ("opening_hours",  "hours"),
             ("phone",          "phone"),
+            ("contact:phone",  "phone"),
             ("website",        "website"),
+            ("contact:website", "website"),
+            ("email",          "email"),
+            ("contact:email",  "email"),
         ):
             val = tags.get(src_key)
-            if val:
+            if val and dst_key not in place:
                 place[dst_key] = val
 
         if ref_lat is not None and ref_lon is not None:

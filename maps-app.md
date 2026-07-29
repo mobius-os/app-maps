@@ -11,7 +11,7 @@ map. It combines public OpenStreetMap geocoding with a persistent Möbius app.
 ## Workflow
 
 1. Research time-sensitive venue facts normally and cite authoritative sources.
-   Mapbook does not make stale prices or hours current.
+   Maps does not make stale prices or hours current.
 2. Geocode every address with:
 
    ```bash
@@ -66,7 +66,15 @@ map. It combines public OpenStreetMap geocoding with a persistent Möbius app.
       "walk": "4 min walk",
       "price": "££",
       "best_for": "Quiet conversation",
-      "note": "A concise explanation of why this place made the map."
+      "note": "A concise explanation of why this place made the map.",
+      "website": "https://example.com",
+      "phone": "+44 20 7946 0123",
+      "hours": "Mo-Fr 08:00-18:00",
+      "google_maps_url": "https://www.google.com/maps/place/…",
+      "rating": 4.6,
+      "review_count": 238,
+      "rating_source": "Google Maps",
+      "rating_checked_at": "YYYY-MM-DD"
     }
   ]
 }
@@ -76,6 +84,14 @@ Use a useful landmark or station as `origin`. Choose the center so all places
 fit at the requested zoom; neighborhood maps normally use zoom 15–16. Preserve
 explicit uncertainty instead of inventing a price, travel time, or opening
 hour.
+
+Website, phone, hours, `google_maps_url`, rating and review fields are optional.
+Prefer the venue's own site and OpenStreetMap contact tags for contact details.
+Ratings and review counts are volatile: include them only when a named source
+and checked date are available, never infer or copy an unattributed number.
+Maps preserves an exact Google Maps place URL when supplied. Otherwise it
+searches Google Maps using the venue name and address, falling back to
+coordinates only when the record has neither.
 
 ## Public services
 
