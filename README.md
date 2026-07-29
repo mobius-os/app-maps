@@ -12,7 +12,12 @@ preview.
 
 - Keeps generated maps in a newest-first visual library.
 - Renders OpenStreetMap tiles with place markers and required attribution.
-- Supports drag, pinch, double-tap, and one-finger double-tap zoom gestures.
+- Shows available venue websites, phone numbers, opening hours, ratings, review
+  counts, and Google Maps links without inventing missing details.
+- Supports smooth drag, pinch, trackpad, double-tap, one-finger, button, and
+  keyboard map navigation.
+- Publishes stable, read-only interactive map links from an in-app sharing sheet
+  with Copy, Open, Update, and Stop sharing controls.
 - Opens the source conversation from each saved map.
 - Ships stdlib-only helpers for geocoding and conflict-safe storage updates.
 
@@ -23,5 +28,5 @@ npm test
 npm run smoke
 ```
 
-Map records live in app-scoped Möbius storage and are never committed to this
-repository.
+Map records and published-map state live in app-scoped Möbius storage and are
+never committed to this repository.

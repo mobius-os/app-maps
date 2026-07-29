@@ -11,6 +11,7 @@ export const CSS = `
     --mb-sand: #f4efe5;
     min-height: 100%;
     height: 100%;
+    position: relative;
     overflow: hidden;
     color: var(--text);
     background:
@@ -93,6 +94,139 @@ export const CSS = `
     outline-offset: 2px;
   }
   .mb-source-chip:disabled { opacity: .45; cursor: default; }
+  .mb-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+  }
+  .mb-share-notice {
+    position: fixed;
+    left: 50%;
+    bottom: calc(18px + var(--mobius-safe-bottom, 0px));
+    z-index: 200;
+    max-width: calc(100% - 32px);
+    padding: 10px 14px;
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+    border-radius: 999px;
+    color: var(--text);
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: 0 12px 32px color-mix(in srgb, #000 20%, transparent);
+    font-size: 13px;
+    font-weight: 750;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 8px);
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+  .mb-share-notice.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .mb-share-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, .5);
+  }
+  .mb-share-sheet {
+    width: 100%;
+    max-width: 520px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 24px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    border: 1px solid var(--border);
+    border-radius: 16px 16px 0 0;
+    color: var(--text);
+    background: var(--surface);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, .3);
+  }
+  .mb-share-handle {
+    width: 42px;
+    height: 4px;
+    margin: -10px auto 18px;
+    border-radius: 999px;
+    background: var(--border);
+  }
+  .mb-share-sheet h3 {
+    margin: 6px 0 8px;
+    font-size: 22px;
+    letter-spacing: -.025em;
+  }
+  .mb-share-sheet-body {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .mb-share-url {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 16px 0 10px;
+    padding: 5px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--surface-2);
+  }
+  .mb-share-url input {
+    min-width: 0;
+    flex: 1;
+    min-height: 44px;
+    padding: 10px;
+    border: 0;
+    border-radius: 8px;
+    outline: none;
+    color: var(--text);
+    background: transparent;
+    font: 16px/1.5 var(--font);
+  }
+  .mb-share-url:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .mb-share-url button {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    flex: none;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    background: var(--surface);
+    cursor: pointer;
+  }
+  .mb-share-url button:hover { border-color: var(--accent); }
+  .mb-share-url button:disabled { opacity: .5; cursor: default; }
+  .mb-share-open {
+    width: 100%;
+    margin-top: 8px;
+  }
+  .mb-share-sheet-actions {
+    display: grid;
+    gap: 8px;
+    margin-top: 22px;
+  }
+  .mb-share-sheet-actions > * { width: 100%; min-width: 0; }
+  .mb-share-stop {
+    min-height: 46px;
+    border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--border));
+    border-radius: 13px;
+    color: var(--danger);
+    background: transparent;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .mb-share-stop:hover { background: color-mix(in srgb, var(--danger) 8%, transparent); }
+  .mb-share-stop:disabled { opacity: .5; cursor: default; }
 
   .mb-library {
     height: 100%;
@@ -494,11 +628,35 @@ export const CSS = `
     line-height: 1.45;
   }
   .mb-address svg { flex: none; margin-top: 1px; color: var(--accent); }
+  .mb-place-details {
+    display: grid;
+    gap: 7px;
+    margin-top: 16px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+  }
+  .mb-place-detail {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+  .mb-place-detail > svg:first-child { flex: none; color: var(--accent); }
+  .mb-place-detail > svg:last-child { flex: none; margin-left: auto; opacity: .7; }
+  .mb-place-detail > span { min-width: 0; overflow-wrap: anywhere; }
+  a.mb-place-detail:hover { color: var(--text); }
+  .mb-rating { color: var(--text); }
+  .mb-rating > svg:first-child { color: #e4a82e; }
+  .mb-rating small { margin-left: auto; color: var(--muted); font-size: 10px; }
   .mb-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    margin-top: 22px;
+    margin-top: 18px;
   }
   .mb-primary, .mb-secondary {
     min-height: 46px;
@@ -621,6 +779,7 @@ export const CSS = `
       padding: 0;
     }
     .mb-source-chip span { display: none; }
+    .mb-header-actions { gap: 6px; }
     .mb-library-header { min-height: 70px; padding: 12px 16px; }
     .mb-library-mark { width: 42px; height: 42px; }
     .mb-library-page { padding: 17px 12px 32px; }
@@ -643,6 +802,8 @@ export const CSS = `
     .mb-place-note { margin: 12px 0 10px; line-height: 1.45; }
     .mb-actions { margin-top: 16px; }
     .mb-source-note { margin-top: 10px; }
+    .mb-share-scrim { padding: 0; }
+    .mb-share-sheet { border-right: 0; border-bottom: 0; border-left: 0; }
   }
 
   @media (min-width: 760px) {
@@ -651,5 +812,6 @@ export const CSS = `
 
   @media (prefers-reduced-motion: reduce) {
     .mb-pin { transition: none; }
+    .mb-share-notice { transition: none; }
   }
 `
