@@ -16,6 +16,51 @@ export function pinchZoom(startZoom, startDistance, currentDistance) {
   )
 }
 
+export function wheelZoomDelta(deltaY, deltaMode = 0) {
+  const pixels = deltaMode === 1
+    ? deltaY * 16
+    : deltaMode === 2
+      ? deltaY * 800
+      : deltaY
+  return clamp(-pixels / 160, -0.5, 0.5)
+}
+
+function isCoordinateOnlyMapsSearch(value) {
+  try {
+    const query = new URL(value).searchParams.get('query') || ''
+    return /^-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?$/.test(query)
+  } catch {
+    return false
+  }
+}
+
+function isGoogleMapsUrl(value) {
+  try {
+    const url = new URL(value)
+    const host = url.hostname.toLowerCase()
+    const googleHost = host === 'google.com'
+      || host.endsWith('.google.com')
+      || /^(?:www|maps)\.google\.[a-z]{2,3}(?:\.[a-z]{2})?$/.test(host)
+      || host === 'goo.gl'
+      || host.endsWith('.goo.gl')
+    return url.protocol === 'https:' && googleHost
+  } catch {
+    return false
+  }
+}
+
+export function googleMapsPlaceUrl(place = {}) {
+  const saved = String(place.google_maps_url || place.maps_url || '').trim()
+  if (saved && isGoogleMapsUrl(saved) && !isCoordinateOnlyMapsSearch(saved)) return saved
+
+  const placeQuery = [place.name, place.address]
+    .map((value) => String(value || '').trim())
+    .filter(Boolean)
+    .join(', ')
+  const query = placeQuery || `${place.lat},${place.lon}`
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+}
+
 export function worldPixel(point, zoom, tileSize = 256) {
   const scale = tileSize * (2 ** zoom)
   const lat = clamp(point.lat, -MAX_LATITUDE, MAX_LATITUDE)

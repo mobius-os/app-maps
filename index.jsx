@@ -4,26 +4,65 @@ import {
   ArrowUpRight,
   Chat,
   ChevronRight,
+  Clock,
   Compass,
+  ExternalLink,
   Maps as MapIcon,
   MapsDirections,
   MapPin,
+  Phone,
+  Share,
   Sparkles,
+  StarFilled,
+  WebsiteNetwork,
 } from '@openai/apps-sdk-ui/components/Icon'
 import {
   clamp,
+  googleMapsPlaceUrl,
   mapPointToPixel,
   panMapCenter,
   pinchZoom,
   tileRangeForViewport,
   oneFingerZoom,
+  wheelZoomDelta,
   zoomMapAtPixel,
 } from './domain.js'
 import { subscribeToMapLibrary } from './storage.js'
+import { copyPlainText } from './clipboard.js'
+import { ShareSheet } from './shareSheet.jsx'
+import {
+  absolutePublicMapUrl,
+  publishMap,
+  readPublishedMap,
+  unpublishMap,
+} from './share.js'
 import { SKILLS_ICON } from './skillIcon.js'
 import { CSS } from './theme.js'
 
 const TILE_SIZE = 256
+
+function externalUrl(value) {
+  if (!value) return ''
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`
+}
+
+function websiteLabel(value) {
+  try {
+    return new URL(externalUrl(value)).hostname.replace(/^www\./, '')
+  } catch {
+    return 'Website'
+  }
+}
+
+function reviewSummary(place) {
+  const rating = Number(place.rating)
+  if (!Number.isFinite(rating)) return ''
+  const count = Number(place.review_count)
+  const reviews = Number.isFinite(count) && count > 0
+    ? ` · ${new Intl.NumberFormat('en-GB').format(count)} reviews`
+    : ''
+  return `${rating.toFixed(1)}${reviews}`
+}
 
 function blobToDataUrl(blob) {
   return new Promise((resolve, reject) => {
@@ -278,6 +317,8 @@ function MapLibrary({ appId, maps, token, onOpen }) {
 function TileMap({ record, selectedPlaceId, onSelectPlace }) {
   const frameRef = useRef(null)
   const pointersRef = useRef(new Map())
+  const animationFrameRef = useRef(null)
+  const pendingViewRef = useRef(null)
   const gestureRef = useRef({
     drag: null,
     pinch: null,
@@ -290,11 +331,21 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
     center: record.center,
     zoom: record.zoom || 16,
   })
+  const viewRef = useRef(view)
   const [tiles, setTiles] = useState({})
 
   useEffect(() => {
-    setView({ center: record.center, zoom: record.zoom || 16 })
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+    animationFrameRef.current = null
+    pendingViewRef.current = null
+    const nextView = { center: record.center, zoom: record.zoom || 16 }
+    viewRef.current = nextView
+    setView(nextView)
   }, [record.id, record.center, record.zoom])
+
+  useEffect(() => () => {
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+  }, [])
 
   useEffect(() => {
     if (!frameRef.current) return undefined
@@ -344,14 +395,34 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
     return () => { cancelled = true }
   }, [record.token, tiles, visibleTiles])
 
+  const queueView = (nextView) => {
+    viewRef.current = nextView
+    pendingViewRef.current = nextView
+    if (animationFrameRef.current) return
+    animationFrameRef.current = requestAnimationFrame(() => {
+      animationFrameRef.current = null
+      const pendingView = pendingViewRef.current
+      pendingViewRef.current = null
+      if (pendingView) setView(pendingView)
+    })
+  }
+
+  const flushView = () => {
+    if (!pendingViewRef.current) return
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+    animationFrameRef.current = null
+    const pendingView = pendingViewRef.current
+    pendingViewRef.current = null
+    setView(pendingView)
+  }
+
   const zoomAt = (pixel, delta) => {
-    setView((current) => {
-      const nextZoom = clamp(current.zoom + delta, 13, 18)
-      if (nextZoom === current.zoom) return current
-      return {
-        zoom: nextZoom,
-        center: zoomMapAtPixel(current.center, pixel, current.zoom, nextZoom, size),
-      }
+    const current = viewRef.current
+    const nextZoom = clamp(current.zoom + delta, 13, 18)
+    if (nextZoom === current.zoom) return
+    queueView({
+      zoom: nextZoom,
+      center: zoomMapAtPixel(current.center, pixel, current.zoom, nextZoom, size),
     })
   }
 
@@ -359,7 +430,8 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
     gestureRef.current.drag = pointer ? {
       x: pointer.x,
       y: pointer.y,
-      center: view.center,
+      center: viewRef.current.center,
+      zoom: viewRef.current.zoom,
     } : null
     gestureRef.current.moved = false
   }
@@ -382,8 +454,8 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
         gestureRef.current.doubleDrag = {
           pointerId: event.pointerId,
           startY: event.clientY,
-          startZoom: view.zoom,
-          startCenter: view.center,
+          startZoom: viewRef.current.zoom,
+          startCenter: viewRef.current.center,
           point: localPoint,
         }
         gestureRef.current.drag = null
@@ -398,8 +470,8 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
           pointers[0].x - pointers[1].x,
           pointers[0].y - pointers[1].y,
         ),
-        startZoom: view.zoom,
-        startCenter: view.center,
+        startZoom: viewRef.current.zoom,
+        startCenter: viewRef.current.center,
         point: {
           x: ((pointers[0].x + pointers[1].x) / 2) - rect.left,
           y: ((pointers[0].y + pointers[1].y) / 2) - rect.top,
@@ -424,7 +496,7 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
         doubleDrag.startY,
         event.clientY,
       )
-      setView({
+      queueView({
         zoom: nextZoom,
         center: zoomMapAtPixel(
           doubleDrag.startCenter,
@@ -446,7 +518,7 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
         pointers[0].y - pointers[1].y,
       )
       const nextZoom = pinchZoom(pinch.startZoom, pinch.distance, distance)
-      setView({
+      queueView({
         zoom: nextZoom,
         center: zoomMapAtPixel(
           pinch.startCenter,
@@ -464,10 +536,10 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
     const dx = pointers[0].x - drag.x
     const dy = pointers[0].y - drag.y
     if (Math.hypot(dx, dy) > 4) gestureRef.current.moved = true
-    setView((current) => ({
-      ...current,
-      center: panMapCenter(drag.center, dx, dy, current.zoom),
-    }))
+    queueView({
+      zoom: drag.zoom,
+      center: panMapCenter(drag.center, dx, dy, drag.zoom),
+    })
   }
 
   const handlePointerEnd = (event) => {
@@ -475,6 +547,7 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
     const point = pointersRef.current.get(event.pointerId)
     pointersRef.current.delete(event.pointerId)
     const remaining = [...pointersRef.current.values()]
+    flushView()
 
     const doubleDrag = gestureRef.current.doubleDrag
     if (doubleDrag?.pointerId === event.pointerId) {
@@ -505,11 +578,21 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
       event.preventDefault()
       const dx = event.key === 'ArrowLeft' ? step : event.key === 'ArrowRight' ? -step : 0
       const dy = event.key === 'ArrowUp' ? step : event.key === 'ArrowDown' ? -step : 0
-      setView((current) => ({
+      const current = viewRef.current
+      queueView({
         ...current,
         center: panMapCenter(current.center, dx, dy, current.zoom),
-      }))
+      })
     }
+  }
+
+  const handleWheel = (event) => {
+    event.preventDefault()
+    const rect = frameRef.current.getBoundingClientRect()
+    zoomAt(
+      { x: event.clientX - rect.left, y: event.clientY - rect.top },
+      wheelZoomDelta(event.deltaY, event.deltaMode),
+    )
   }
 
   return (
@@ -519,8 +602,9 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
         className="mb-map-frame"
         data-zoom={view.zoom}
         tabIndex="0"
-        aria-label="Interactive map. Drag to move, pinch or double-tap to zoom. Keyboard users can use arrow keys and plus or minus."
+        aria-label="Interactive map. Drag to move, pinch, use two fingers on a trackpad, or double-tap to zoom. Keyboard users can use arrow keys and plus or minus."
         onKeyDown={handleKeyDown}
+        onWheel={handleWheel}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
@@ -594,6 +678,8 @@ function TileMap({ record, selectedPlaceId, onSelectPlace }) {
 }
 
 function PlacePanel({ record, place, placeNumber }) {
+  const rating = reviewSummary(place)
+  const phoneHref = place.phone ? `tel:${String(place.phone).replace(/[^\d+]/g, '')}` : ''
   const openSourceChat = () => {
     if (!record.source_chat?.id) return
     window.parent.postMessage(
@@ -617,6 +703,39 @@ function PlacePanel({ record, place, placeNumber }) {
       </div>
       <p className="mb-place-note">{place.note}</p>
       <p className="mb-address"><MapPin width={15} height={15} /> {place.address}</p>
+      <div className="mb-place-details" aria-label="Place details">
+        {rating && (
+          <span className="mb-place-detail mb-rating">
+            <StarFilled width={15} height={15} />
+            <strong>{rating}</strong>
+            {place.rating_source && <small>{place.rating_source}</small>}
+          </span>
+        )}
+        {place.hours && (
+          <span className="mb-place-detail">
+            <Clock width={15} height={15} />
+            <span>{place.hours}</span>
+          </span>
+        )}
+        {place.website && (
+          <a className="mb-place-detail" href={externalUrl(place.website)} target="_blank" rel="noreferrer">
+            <WebsiteNetwork width={15} height={15} />
+            <span>{websiteLabel(place.website)}</span>
+            <ExternalLink width={13} height={13} />
+          </a>
+        )}
+        {place.phone && (
+          <a className="mb-place-detail" href={phoneHref}>
+            <Phone width={15} height={15} />
+            <span>{place.phone}</span>
+          </a>
+        )}
+        <a className="mb-place-detail" href={googleMapsPlaceUrl(place)} target="_blank" rel="noreferrer">
+          <MapIcon width={15} height={15} />
+          <span>Google Maps</span>
+          <ExternalLink width={13} height={13} />
+        </a>
+      </div>
       <div className="mb-actions">
         <a
           className="mb-primary"
@@ -650,7 +769,12 @@ export default function App({ appId, token }) {
   const [selectedMapId, setSelectedMapId] = useState('')
   const [selectedPlaceId, setSelectedPlaceId] = useState('')
   const [status, setStatus] = useState('loading')
+  const [shareNotice, setShareNotice] = useState('')
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareUrl, setShareUrl] = useState('')
+  const [shareBusy, setShareBusy] = useState('')
   const navRef = useRef(null)
+  const shareTimerRef = useRef(null)
 
   const closeMap = useCallback(() => {
     try { navRef.current?.close?.() } catch {}
@@ -717,6 +841,7 @@ export default function App({ appId, token }) {
 
   useEffect(() => () => {
     try { navRef.current?.close?.() } catch {}
+    if (shareTimerRef.current) window.clearTimeout(shareTimerRef.current)
   }, [])
 
   const selectedMap = maps.find((record) => record.id === selectedMapId)
@@ -729,6 +854,12 @@ export default function App({ appId, token }) {
         : selectedMap.places[0]?.id || ''
     ))
   }, [selectedMap])
+
+  useEffect(() => {
+    setShareOpen(false)
+    setShareUrl('')
+    setShareBusy('')
+  }, [selectedMap?.id])
 
   if (status === 'loading') {
     return (
@@ -768,6 +899,67 @@ export default function App({ appId, token }) {
       '*',
     )
   }
+  const showShareNotice = (message) => {
+    setShareNotice(message)
+    if (shareTimerRef.current) window.clearTimeout(shareTimerRef.current)
+    shareTimerRef.current = window.setTimeout(() => {
+      shareTimerRef.current = null
+      setShareNotice('')
+    }, 2600)
+  }
+  const openShare = async () => {
+    if (shareOpen) return
+    setShareOpen(true)
+    setShareUrl('')
+    setShareBusy('loading')
+    try {
+      const existing = await readPublishedMap({
+        storage: window.mobius.storage,
+        record: selectedMap,
+      })
+      if (existing) {
+        setShareUrl(absolutePublicMapUrl(existing.url, window.location.href))
+      }
+    } catch {
+      showShareNotice('Couldn’t check this map’s public link')
+    } finally {
+      setShareBusy('')
+    }
+  }
+  const publishShare = async () => {
+    if (shareBusy) return
+    setShareBusy('publish')
+    try {
+      const published = await publishMap({ appId, token, record: selectedMap })
+      setShareUrl(absolutePublicMapUrl(published.url, window.location.href))
+      showShareNotice(shareUrl ? 'Public map updated' : 'Public link created')
+    } catch (error) {
+      showShareNotice(error?.message || 'Couldn’t publish this map')
+    } finally {
+      setShareBusy('')
+    }
+  }
+  const copyShare = async () => {
+    if (!shareUrl) return
+    if (await copyPlainText(shareUrl)) {
+      showShareNotice('Public link copied')
+    } else {
+      showShareNotice('Select the link and use Copy on your device')
+    }
+  }
+  const stopShare = async () => {
+    if (shareBusy) return
+    setShareBusy('stop')
+    try {
+      await unpublishMap({ appId, token, record: selectedMap })
+      setShareUrl('')
+      showShareNotice('Public link removed')
+    } catch (error) {
+      showShareNotice(error?.message || 'Couldn’t stop sharing this map')
+    } finally {
+      setShareBusy('')
+    }
+  }
 
   return (
     <div className="mb-root">
@@ -787,15 +979,26 @@ export default function App({ appId, token }) {
           <h1>{selectedMap.title}</h1>
           <p>{selectedMap.subtitle}</p>
         </div>
-        <button
-          type="button"
-          className="mb-source-chip"
-          onClick={openSourceChat}
-          disabled={!selectedMap.source_chat?.id}
-        >
-          <Chat width={16} height={16} />
-          <span>Source chat</span>
-        </button>
+        <div className="mb-header-actions">
+          <button
+            type="button"
+            className="mb-source-chip"
+            onClick={openShare}
+            aria-label="Share this map"
+          >
+            <Share width={16} height={16} />
+            <span>Share</span>
+          </button>
+          <button
+            type="button"
+            className="mb-source-chip"
+            onClick={openSourceChat}
+            disabled={!selectedMap.source_chat?.id}
+          >
+            <Chat width={16} height={16} />
+            <span>Source chat</span>
+          </button>
+        </div>
       </header>
 
       <div className="mb-layout">
@@ -828,6 +1031,18 @@ export default function App({ appId, token }) {
           />
         </section>
       </div>
+      <div className={`mb-share-notice${shareNotice ? ' is-visible' : ''}`} role="status" aria-live="polite">
+        {shareNotice}
+      </div>
+      <ShareSheet
+        open={shareOpen}
+        url={shareUrl}
+        busy={shareBusy}
+        onClose={() => setShareOpen(false)}
+        onPublish={publishShare}
+        onCopy={copyShare}
+        onStop={stopShare}
+      />
       </div>
     </div>
   )
