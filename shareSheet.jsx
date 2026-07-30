@@ -1,14 +1,20 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import {
   ArrowUpRight,
   Copy,
+  X,
 } from '@openai/apps-sdk-ui/components/Icon'
+import {
+  mapLinkPreviewAlt,
+  mapLinkPreviewDataUrl,
+} from './linkPreview.js'
 
-export function ShareSheet({ open, url, busy, onClose, onPublish, onCopy, onStop }) {
+export function ShareSheet({ open, record, url, busy, onClose, onPublish, onCopy, onStop }) {
   const sheetRef = useRef(null)
   const busyRef = useRef(busy)
   const closeRef = useRef(onClose)
   const locked = Boolean(busy && busy !== 'loading')
+  const previewUrl = useMemo(() => mapLinkPreviewDataUrl(record), [record])
   busyRef.current = locked
   closeRef.current = onClose
 
@@ -58,14 +64,28 @@ export function ShareSheet({ open, url, busy, onClose, onPublish, onCopy, onStop
     >
       <div ref={sheetRef} className="mb-share-sheet" onClick={(event) => event.stopPropagation()}>
         <div className="mb-share-handle" aria-hidden="true" />
-        <p className="mb-kicker">Public map</p>
-        <h3 id="mb-share-title">{shared ? 'Shared map' : 'Share this map'}</h3>
+        <div className="mb-share-heading">
+          <div>
+            <p className="mb-kicker">Public map</p>
+            <h3 id="mb-share-title">{shared ? 'Ready to share' : 'Share this map'}</h3>
+          </div>
+          <button
+            type="button"
+            className="mb-share-close"
+            aria-label="Close sharing"
+            onClick={onClose}
+            disabled={locked}
+          >
+            <X width={18} height={18} aria-hidden="true" />
+          </button>
+        </div>
+        <img className="mb-share-preview" src={previewUrl} alt={mapLinkPreviewAlt(record)} />
         <p className="mb-share-sheet-body">
           {busy === 'loading'
             ? 'Checking for an existing public link…'
             : shared
-              ? 'Anyone with this link can explore the current public map.'
-              : 'Publish the current map as a stable public page.'}
+              ? 'Anyone with the link can explore the map. Its preview updates with the public page.'
+              : 'Create one stable link with an interactive map and its own rich preview.'}
         </p>
         {shared && (
           <div className="mb-share-url">
@@ -80,29 +100,35 @@ export function ShareSheet({ open, url, busy, onClose, onPublish, onCopy, onStop
             </button>
           </div>
         )}
-        {shared && (
-          <a className="mb-secondary mb-share-open" href={url} target="_blank" rel="noreferrer">
-            Open public map <ArrowUpRight width={15} height={15} />
-          </a>
-        )}
         <div className="mb-share-sheet-actions">
           {!shared && busy !== 'loading' && (
             <button type="button" className="mb-primary" onClick={onPublish} disabled={Boolean(busy)}>
-              {busy === 'publish' ? 'Publishing…' : 'Create public link'}
+              {busy === 'publish' ? 'Creating…' : 'Create link'}
             </button>
           )}
           {shared && (
-            <button type="button" className="mb-secondary" onClick={onPublish} disabled={Boolean(busy)}>
-              {busy === 'publish' ? 'Updating…' : 'Update public map'}
-            </button>
+            <>
+              <button type="button" className="mb-primary" onClick={onCopy} disabled={Boolean(busy)}>
+                <Copy width={16} height={16} aria-hidden="true" />
+                Copy link
+              </button>
+              <a className="mb-secondary" href={url} target="_blank" rel="noreferrer">
+                Open <ArrowUpRight width={15} height={15} aria-hidden="true" />
+              </a>
+            </>
           )}
-          {shared && (
-            <button type="button" className="mb-share-stop" onClick={onStop} disabled={Boolean(busy)}>
+        </div>
+        {shared && (
+          <div className="mb-share-maintenance">
+            <button type="button" onClick={onPublish} disabled={Boolean(busy)}>
+              {busy === 'publish' ? 'Updating…' : 'Update map & preview'}
+            </button>
+            <span aria-hidden="true">·</span>
+            <button type="button" className="is-danger" onClick={onStop} disabled={Boolean(busy)}>
               {busy === 'stop' ? 'Stopping…' : 'Stop sharing'}
             </button>
-          )}
-          <button type="button" className="mb-secondary" onClick={onClose} disabled={locked}>Done</button>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )

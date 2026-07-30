@@ -4,27 +4,6 @@ export function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
 }
 
-export function oneFingerZoom(startZoom, startY, currentY) {
-  return clamp(startZoom + ((currentY - startY) / 110), 13, 18)
-}
-
-export function pinchZoom(startZoom, startDistance, currentDistance) {
-  return clamp(
-    startZoom + Math.log2(currentDistance / Math.max(1, startDistance)),
-    13,
-    18,
-  )
-}
-
-export function wheelZoomDelta(deltaY, deltaMode = 0) {
-  const pixels = deltaMode === 1
-    ? deltaY * 16
-    : deltaMode === 2
-      ? deltaY * 800
-      : deltaY
-  return clamp(-pixels / 160, -0.5, 0.5)
-}
-
 function isCoordinateOnlyMapsSearch(value) {
   try {
     const query = new URL(value).searchParams.get('query') || ''
@@ -71,16 +50,6 @@ export function worldPixel(point, zoom, tileSize = 256) {
   }
 }
 
-export function worldPixelToPoint(pixel, zoom, tileSize = 256) {
-  const scale = tileSize * (2 ** zoom)
-  const lon = (pixel.x / scale) * 360 - 180
-  const n = Math.PI - ((2 * Math.PI * pixel.y) / scale)
-  return {
-    lat: (180 / Math.PI) * Math.atan(Math.sinh(n)),
-    lon,
-  }
-}
-
 export function mapPointToPixel(point, center, zoom, size) {
   const target = worldPixel(point, zoom)
   const origin = worldPixel(center, zoom)
@@ -88,31 +57,6 @@ export function mapPointToPixel(point, center, zoom, size) {
     x: target.x - origin.x + (size.width / 2),
     y: target.y - origin.y + (size.height / 2),
   }
-}
-
-export function panMapCenter(center, dx, dy, zoom) {
-  const origin = worldPixel(center, zoom)
-  return worldPixelToPoint(
-    { x: origin.x - dx, y: origin.y - dy },
-    zoom,
-  )
-}
-
-export function zoomMapAtPixel(center, pixel, zoom, nextZoom, size) {
-  const currentCenter = worldPixel(center, zoom)
-  const targetAtCurrentZoom = {
-    x: currentCenter.x + pixel.x - (size.width / 2),
-    y: currentCenter.y + pixel.y - (size.height / 2),
-  }
-  const target = worldPixelToPoint(targetAtCurrentZoom, zoom)
-  const targetAtNextZoom = worldPixel(target, nextZoom)
-  return worldPixelToPoint(
-    {
-      x: targetAtNextZoom.x - pixel.x + (size.width / 2),
-      y: targetAtNextZoom.y - pixel.y + (size.height / 2),
-    },
-    nextZoom,
-  )
 }
 
 function tileNorthWest(x, y, zoom) {
