@@ -2,8 +2,8 @@
   "id": "maps",
   "previous_id": "mapbook",
   "name": "Maps",
-  "version": "0.1.10",
-  "description": "Visualise and keep maps created in Möbius, with a location skill and links back to their source conversations.",
+  "version": "0.2.0",
+  "description": "Visualise and keep maps created in M\u00f6bius, with a location skill and links back to their source conversations.",
   "author": "mobius-os",
   "license": "MIT",
   "homepage": "https://github.com/mobius-os/app-maps",
@@ -25,15 +25,24 @@
   "skills": [
     "maps-app.md"
   ],
+  "static_assets": {
+    "map-viewer-0.2.0.js": "map-viewer-0.2.0.js",
+    "vendor/leaflet-1.9.4.css": "vendor/leaflet-1.9.4.css",
+    "vendor/leaflet-1.9.4.js": "vendor/leaflet-1.9.4.js"
+  },
   "source_files": [
     "clipboard.js",
     "domain.js",
+    "linkPreview.js",
+    "SharedMapDetail.jsx",
     "publicMap.js",
     "share.js",
     "shareSheet.jsx",
     "storage.js",
     "skillIcon.js",
     "theme.js",
+    "viewerAssets.js",
+    "LEAFLET-LICENSE.txt",
     "maps-app.md",
     "scripts/add_map.py",
     "scripts/maps_client.py"

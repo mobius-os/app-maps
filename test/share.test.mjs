@@ -40,21 +40,46 @@ test('public map HTML embeds safe data and a real interactive map', () => {
   const html = buildPublicMapHtml({
     ...record,
     title: 'Coffee <script>alert(1)</script>',
-  })
+  }, { appId: 101 })
 
-  assert.match(html, /Shared from Möbius Maps/)
-  assert.match(html, /tile\.openstreetmap\.org/)
-  assert.match(html, /pointerdown/)
-  assert.match(html, /gesture\.pinch/)
-  assert.match(html, /wheelDelta/)
-  assert.match(html, /deltaMode/)
-  assert.match(html, /clamp\(nextZoom,13,18\)/)
-  assert.match(html, /WEB/)
-  assert.match(html, /Google Maps/)
-  assert.match(html, /coordinateOnlyMapsSearch/)
-  assert.match(html, /Open directions/)
+  assert.match(html, /<mobius-map-viewer>/)
+  assert.match(html, /app-assets\/by-id\/101\/map-viewer-0\.2\.0\.js/)
+  assert.match(html, /app-assets\/by-id\/101\/vendor\/leaflet-1\.9\.4\.js/)
+  assert.match(html, /mode: 'public'/)
+  assert.match(html, /tileMode: 'direct'/)
+  assert.doesNotMatch(html, /property="og:/)
+  assert.doesNotMatch(html, /pointerdown|gesture\.pinch|clamp\(nextZoom/)
   assert.doesNotMatch(html, /<script>alert\(1\)<\/script>/)
   assert.match(html, /Coffee \\u003cscript>alert\(1\)\\u003c\/script>/)
+})
+
+test('published pages carry a map-specific rich link preview', () => {
+  const html = buildPublicMapHtml(record, {
+    appId: 101,
+    publicUrl: 'https://mobius.test/sites/abc123/',
+  })
+
+  assert.match(html, /property="og:type" content="website"/)
+  assert.match(html, /property="og:url" content="https:\/\/mobius\.test\/sites\/abc123\/"/)
+  assert.match(html, /property="og:image" content="https:\/\/mobius\.test\/sites\/abc123\/preview\.png"/)
+  assert.match(html, /property="og:image:width" content="1200"/)
+  assert.match(html, /property="og:image:height" content="630"/)
+  assert.match(html, /name="twitter:card" content="summary_large_image"/)
+  assert.match(html, /name="twitter:image" content="https:\/\/mobius\.test\/sites\/abc123\/preview\.png"/)
+})
+
+test('the public page preserves regional zoom and delegates rendering', () => {
+  const html = buildPublicMapHtml({ ...record, zoom: 8 }, { appId: 101 })
+
+  assert.match(html, /"zoom":8/)
+  assert.doesNotMatch(html, /"zoom":13/)
+})
+
+test('publishing requires the installed app id that owns the shared renderer', () => {
+  assert.throws(
+    () => buildPublicMapHtml(record),
+    /valid Maps app id/,
+  )
 })
 
 test('publication project ids are stable, bounded, and path-safe', () => {

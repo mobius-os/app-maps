@@ -20,48 +20,10 @@ export const CSS = `
     font-family: var(--font);
   }
 
-  .mb-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 22px 22px 16px;
-  }
   .mb-detail {
     height: 100%;
+    overflow-x: hidden;
     overflow-y: auto;
-  }
-  .mb-detail-header { justify-content: flex-start; }
-  .mb-detail-title { min-width: 0; flex: 1; }
-  .mb-back {
-    width: 40px;
-    height: 40px;
-    display: grid;
-    place-items: center;
-    flex: none;
-    margin-top: 3px;
-    padding: 0;
-    border: 1px solid var(--border);
-    border-radius: 13px;
-    color: var(--text);
-    background: color-mix(in srgb, var(--surface) 88%, transparent);
-    cursor: pointer;
-  }
-  .mb-back:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent);
-    outline-offset: 2px;
-  }
-  .mb-header h1 {
-    margin: 2px 0 3px;
-    font-size: clamp(25px, 4vw, 38px);
-    line-height: 1.02;
-    letter-spacing: -0.045em;
-    color: var(--text);
-  }
-  .mb-header > div > p:last-child {
-    margin: 0;
-    color: var(--muted);
-    font-size: 14px;
   }
   .mb-kicker {
     margin: 0;
@@ -71,34 +33,6 @@ export const CSS = `
     font-weight: 800;
     letter-spacing: .14em;
     text-transform: uppercase;
-  }
-  .mb-source-chip {
-    flex: none;
-    margin-top: 4px;
-    min-height: 40px;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 11px;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    color: var(--text);
-    background: color-mix(in srgb, var(--surface) 88%, transparent);
-    font-size: 12px;
-    font-weight: 800;
-    cursor: pointer;
-  }
-  .mb-source-chip svg { color: var(--accent); }
-  .mb-source-chip:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent);
-    outline-offset: 2px;
-  }
-  .mb-source-chip:disabled { opacity: .45; cursor: default; }
-  .mb-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: none;
   }
   .mb-share-notice {
     position: fixed;
@@ -135,7 +69,7 @@ export const CSS = `
   }
   .mb-share-sheet {
     width: 100%;
-    max-width: 520px;
+    max-width: 560px;
     max-height: 85vh;
     overflow-y: auto;
     padding: 24px;
@@ -157,6 +91,39 @@ export const CSS = `
     margin: 6px 0 8px;
     font-size: 22px;
     letter-spacing: -.025em;
+  }
+  .mb-share-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+  .mb-share-close {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    flex: none;
+    margin-top: -2px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    background: var(--surface-2);
+    cursor: pointer;
+  }
+  .mb-share-close:hover { color: var(--text); border-color: var(--accent); }
+  .mb-share-close:disabled { opacity: .5; cursor: default; }
+  .mb-share-preview {
+    width: 100%;
+    aspect-ratio: 1200 / 630;
+    display: block;
+    margin: 10px 0 14px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-2);
+    box-shadow: 0 12px 28px color-mix(in srgb, #000 16%, transparent);
   }
   .mb-share-sheet-body {
     margin: 0 0 16px;
@@ -205,28 +172,43 @@ export const CSS = `
   }
   .mb-share-url button:hover { border-color: var(--accent); }
   .mb-share-url button:disabled { opacity: .5; cursor: default; }
-  .mb-share-open {
-    width: 100%;
-    margin-top: 8px;
-  }
   .mb-share-sheet-actions {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 8px;
-    margin-top: 22px;
+    margin-top: 18px;
   }
   .mb-share-sheet-actions > * { width: 100%; min-width: 0; }
-  .mb-share-stop {
-    min-height: 46px;
-    border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--border));
-    border-radius: 13px;
-    color: var(--danger);
+  .mb-share-maintenance {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .mb-share-maintenance button {
+    min-height: 44px;
+    padding: 8px;
+    border: 0;
+    border-radius: 8px;
+    color: var(--muted);
     background: transparent;
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 700;
     cursor: pointer;
   }
-  .mb-share-stop:hover { background: color-mix(in srgb, var(--danger) 8%, transparent); }
-  .mb-share-stop:disabled { opacity: .5; cursor: default; }
+  .mb-share-maintenance button:hover {
+    color: var(--text);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+  .mb-share-maintenance button.is-danger { color: var(--danger); }
+  .mb-share-maintenance button.is-danger:hover {
+    background: color-mix(in srgb, var(--danger) 8%, transparent);
+  }
+  .mb-share-maintenance button:disabled { opacity: .5; cursor: default; }
 
   .mb-library {
     height: 100%;
@@ -390,274 +372,6 @@ export const CSS = `
     font-size: 8px;
   }
 
-  .mb-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(290px, .8fr);
-    gap: 16px;
-    padding: 0 18px 18px;
-  }
-  .mb-map-column, .mb-info-column { min-width: 0; }
-  .mb-map-wrap {
-    overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    box-shadow: 0 16px 40px rgba(15, 38, 31, .11);
-  }
-  .mb-map-frame {
-    position: relative;
-    height: clamp(380px, 62vh, 660px);
-    overflow: hidden;
-    background: #e7e5dc;
-    isolation: isolate;
-    touch-action: none;
-    cursor: grab;
-    user-select: none;
-  }
-  .mb-map-frame:active { cursor: grabbing; }
-  .mb-map-frame:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--accent) 56%, transparent);
-    outline-offset: -4px;
-  }
-  .mb-map-fallback {
-    position: absolute;
-    inset: 0;
-    background-color: #e9e5d9;
-    background-image:
-      linear-gradient(rgba(255,255,255,.48) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.48) 1px, transparent 1px);
-    background-size: 38px 38px;
-  }
-  .mb-tile {
-    position: absolute;
-    z-index: 1;
-    width: 256px;
-    height: 256px;
-    max-width: none;
-    user-select: none;
-    pointer-events: none;
-  }
-  .mb-pin {
-    position: absolute;
-    z-index: 5;
-    width: 38px;
-    height: 38px;
-    margin: -19px 0 0 -19px;
-    display: grid;
-    place-items: center;
-    border: 0;
-    border-radius: 50% 50% 50% 12px;
-    color: white;
-    background: var(--mb-forest);
-    box-shadow: 0 7px 18px rgba(20, 51, 43, .34);
-    transform: rotate(-45deg);
-    cursor: pointer;
-    transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
-  }
-  .mb-pin span {
-    transform: rotate(45deg);
-    font-size: 13px;
-    font-weight: 900;
-  }
-  .mb-pin:hover, .mb-pin:focus-visible {
-    transform: rotate(-45deg) scale(1.08);
-    outline: 3px solid rgba(255,255,255,.95);
-    outline-offset: 2px;
-  }
-  .mb-pin.is-selected {
-    z-index: 7;
-    background: var(--mb-coral);
-    transform: rotate(-45deg) scale(1.18);
-    box-shadow: 0 9px 22px rgba(198, 68, 45, .42);
-  }
-  .mb-station {
-    position: absolute;
-    z-index: 4;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin: -15px 0 0 -15px;
-    pointer-events: none;
-    white-space: nowrap;
-  }
-  .mb-station span {
-    width: 30px;
-    height: 30px;
-    display: grid;
-    place-items: center;
-    border: 3px solid white;
-    border-radius: 50%;
-    color: white;
-    background: #171e1c;
-    box-shadow: 0 4px 12px rgba(0,0,0,.25);
-  }
-  .mb-station strong {
-    padding: 4px 7px;
-    border-radius: 6px;
-    color: #14211e;
-    background: rgba(255,255,255,.92);
-    box-shadow: 0 3px 10px rgba(20, 38, 32, .15);
-    font-size: 10px;
-    letter-spacing: .02em;
-  }
-  .mb-attribution {
-    position: absolute;
-    z-index: 8;
-    right: 8px;
-    bottom: 6px;
-    padding: 3px 5px;
-    color: #344b45;
-    background: rgba(255,255,255,.84);
-    border-radius: 4px;
-    font-size: 9px;
-    text-decoration: none;
-  }
-
-  .mb-place-strip {
-    display: flex;
-    gap: 8px;
-    margin-top: 11px;
-    padding: 1px 1px 4px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .mb-place-strip::-webkit-scrollbar { display: none; }
-  .mb-place-strip button {
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: none;
-    padding: 6px 11px 6px 7px;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    color: var(--muted);
-    background: var(--surface);
-    cursor: pointer;
-  }
-  .mb-place-strip button span {
-    width: 28px;
-    height: 28px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    color: var(--mb-forest);
-    background: var(--mb-mint);
-    font-size: 11px;
-    font-weight: 900;
-  }
-  .mb-place-strip button strong { font-size: 12px; }
-  .mb-place-strip button.is-selected {
-    border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
-    color: var(--text);
-    background: color-mix(in srgb, var(--accent) 9%, var(--surface));
-  }
-  .mb-place-strip button.is-selected span { color: white; background: var(--mb-coral); }
-
-  .mb-info-column {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .mb-place-panel {
-    border: 1px solid var(--border);
-    border-radius: 22px;
-    background: color-mix(in srgb, var(--surface) 94%, transparent);
-    box-shadow: 0 12px 30px rgba(15, 38, 31, .06);
-  }
-  .mb-place-panel { padding: 20px; }
-  .mb-place-topline {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 28px;
-  }
-  .mb-place-number {
-    width: 34px;
-    height: 34px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    color: white;
-    background: var(--mb-coral);
-    font-size: 13px;
-    font-weight: 900;
-  }
-  .mb-walk {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 700;
-  }
-  .mb-place-heading {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .mb-place-heading h2 {
-    margin: 5px 0 0;
-    color: var(--text);
-    font-size: clamp(22px, 3vw, 31px);
-    line-height: 1.04;
-    letter-spacing: -.04em;
-  }
-  .mb-price {
-    flex: none;
-    padding: 7px 9px;
-    border-radius: 10px;
-    color: var(--mb-forest);
-    background: var(--mb-mint);
-    font-size: 12px;
-    font-weight: 850;
-  }
-  .mb-place-note {
-    margin: 16px 0 13px;
-    color: var(--muted);
-    font-size: 14px;
-    line-height: 1.55;
-  }
-  .mb-address {
-    display: flex;
-    align-items: flex-start;
-    gap: 7px;
-    margin: 0;
-    color: var(--text);
-    font-size: 12px;
-    line-height: 1.45;
-  }
-  .mb-address svg { flex: none; margin-top: 1px; color: var(--accent); }
-  .mb-place-details {
-    display: grid;
-    gap: 7px;
-    margin-top: 16px;
-    padding-top: 15px;
-    border-top: 1px solid var(--border);
-  }
-  .mb-place-detail {
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.35;
-    text-decoration: none;
-  }
-  .mb-place-detail > svg:first-child { flex: none; color: var(--accent); }
-  .mb-place-detail > svg:last-child { flex: none; margin-left: auto; opacity: .7; }
-  .mb-place-detail > span { min-width: 0; overflow-wrap: anywhere; }
-  a.mb-place-detail:hover { color: var(--text); }
-  .mb-rating { color: var(--text); }
-  .mb-rating > svg:first-child { color: #e4a82e; }
-  .mb-rating small { margin-left: auto; color: var(--muted); font-size: 10px; }
-  .mb-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 18px;
-  }
   .mb-primary, .mb-secondary {
     min-height: 46px;
     display: inline-flex;
@@ -672,7 +386,7 @@ export const CSS = `
   }
   .mb-primary {
     border: 1px solid var(--mb-forest);
-    color: white;
+    color: var(--accent-fg);
     background: var(--mb-forest);
   }
   .mb-secondary {
@@ -685,12 +399,6 @@ export const CSS = `
     outline-offset: 2px;
   }
   .mb-secondary:disabled { opacity: .5; cursor: default; }
-  .mb-source-note {
-    margin: 14px 0 0;
-    color: var(--muted);
-    font-size: 10px;
-    line-height: 1.4;
-  }
   .mb-map-card {
     position: relative;
     width: 100%;
@@ -768,18 +476,6 @@ export const CSS = `
   .mb-loading { gap: 10px; color: var(--muted); font-size: 13px; }
 
   @media (max-width: 720px) {
-    .mb-header { padding: 18px 16px 13px; }
-    .mb-header h1 { font-size: 27px; }
-    .mb-detail-header { gap: 9px; }
-    .mb-source-chip {
-      width: 38px;
-      height: 38px;
-      min-height: 38px;
-      justify-content: center;
-      padding: 0;
-    }
-    .mb-source-chip span { display: none; }
-    .mb-header-actions { gap: 6px; }
     .mb-library-header { min-height: 70px; padding: 12px 16px; }
     .mb-library-mark { width: 42px; height: 42px; }
     .mb-library-page { padding: 17px 12px 32px; }
@@ -788,20 +484,6 @@ export const CSS = `
     .mb-map-card { min-height: 246px; }
     .mb-card-preview { height: 148px; }
     .mb-map-card-copy > span { font-size: 11px; }
-    .mb-layout {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 0 12px 18px;
-    }
-    .mb-map-frame { height: min(43vh, 360px); min-height: 300px; }
-    .mb-map-wrap { border-radius: 20px; }
-    .mb-place-panel { padding: 17px; border-radius: 20px; }
-    .mb-place-topline { margin-bottom: 16px; }
-    .mb-place-heading h2 { font-size: 24px; }
-    .mb-place-note { margin: 12px 0 10px; line-height: 1.45; }
-    .mb-actions { margin-top: 16px; }
-    .mb-source-note { margin-top: 10px; }
     .mb-share-scrim { padding: 0; }
     .mb-share-sheet { border-right: 0; border-bottom: 0; border-left: 0; }
   }
@@ -811,7 +493,6 @@ export const CSS = `
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .mb-pin { transition: none; }
     .mb-share-notice { transition: none; }
   }
 `
