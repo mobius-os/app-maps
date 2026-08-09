@@ -231,7 +231,7 @@ function MapLibrary({ appId, maps, token, onOpen }) {
   return (
     <div className="mb-library">
       <header className="mb-library-header">
-        <span className="mb-library-mark" aria-hidden="true">
+        <span className="mb-library-mark" ref={(el) => el && window.mobius.immersive && window.mobius.immersive.holdToToggle(el)} aria-hidden="true">
           <img src={`/api/apps/${appId}/icon?size=64`} alt="" />
         </span>
         <div>
