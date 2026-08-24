@@ -232,7 +232,7 @@ function MapLibrary({ appId, maps, token, onOpen }) {
     <div className="mb-library">
       <header className="mb-library-header">
         <div className="mb-library-header-inner">
-        <span className="mb-library-mark" ref={(el) => el && window.mobius.immersive && window.mobius.immersive.holdToToggle(el)} aria-hidden="true">
+        <span className="mb-library-mark" aria-hidden="true">
           <img src={`/api/apps/${appId}/icon?size=64`} alt="" onError={(event) => { event.currentTarget.style.display = 'none'; event.currentTarget.nextElementSibling.style.display = 'grid' }} />
           <span className="mb-library-mark-fallback" style={{ display: 'none' }}>M</span>
         </span>

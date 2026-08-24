@@ -14,9 +14,7 @@ export const CSS = `
     position: relative;
     overflow: hidden;
     color: var(--text);
-    background:
-      radial-gradient(circle at 90% -10%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 34%),
-      var(--bg);
+    background: var(--bg);
     font-family: var(--font);
   }
 
@@ -224,8 +222,7 @@ export const CSS = `
     flex: none;
     padding: 0;
     border-bottom: 1px solid var(--border);
-    background: color-mix(in srgb, var(--bg) 94%, transparent);
-    backdrop-filter: blur(18px);
+    background: var(--bg);
   }
   .mb-library-header-inner {
     width: 100%;
@@ -508,4 +505,19 @@ export const CSS = `
   @media (prefers-reduced-motion: reduce) {
     .mb-share-notice { transition: none; }
   }
+
+/* mobius-ui:CenteredRail v1 */
+@media (min-width: 900px) {
+  .mb-root {
+    background:
+      linear-gradient(var(--bg), var(--bg)) center / min(100%, 74rem) 100% no-repeat,
+      radial-gradient(ellipse 76% 112% at 50% 46%,
+        color-mix(in srgb, var(--accent) 18%, var(--bg)) 0%,
+        color-mix(in srgb, var(--accent) 7%, var(--bg)) 46%,
+        color-mix(in srgb, var(--text) 2%, var(--bg)) 100%);
+
+  }
+  .mb-library-header { width: min(100%, 74rem); margin-inline: auto; }
+}
+/* /mobius-ui:CenteredRail */
 `
