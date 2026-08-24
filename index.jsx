@@ -231,12 +231,15 @@ function MapLibrary({ appId, maps, token, onOpen }) {
   return (
     <div className="mb-library">
       <header className="mb-library-header">
+        <div className="mb-library-header-inner">
         <span className="mb-library-mark" ref={(el) => el && window.mobius.immersive && window.mobius.immersive.holdToToggle(el)} aria-hidden="true">
-          <img src={`/api/apps/${appId}/icon?size=64`} alt="" />
+          <img src={`/api/apps/${appId}/icon?size=64`} alt="" onError={(event) => { event.currentTarget.style.display = 'none'; event.currentTarget.nextElementSibling.style.display = 'grid' }} />
+          <span className="mb-library-mark-fallback" style={{ display: 'none' }}>M</span>
         </span>
         <div>
           <h1>Maps</h1>
           <p>{maps.length} {maps.length === 1 ? 'map' : 'maps'} · {placeCount} places · {areaCount} {areaCount === 1 ? 'area' : 'areas'}</p>
+        </div>
         </div>
       </header>
 

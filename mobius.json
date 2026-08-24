@@ -2,7 +2,7 @@
   "id": "maps",
   "previous_id": "mapbook",
   "name": "Maps",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Visualise and keep maps created in M\u00f6bius, with a location skill and links back to their source conversations.",
   "author": "mobius-os",
   "license": "MIT",
