@@ -228,7 +228,8 @@ export const CSS = `
     backdrop-filter: blur(18px);
   }
   .mb-library-header-inner {
-    width: min(796px, 100%);
+    width: 100%;
+    max-width: 74rem;
     margin-inline: auto;
     display: flex;
     align-items: center;
@@ -263,7 +264,8 @@ export const CSS = `
     -webkit-overflow-scrolling: touch;
   }
   .mb-library-page {
-    width: min(760px, 100%);
+    width: 100%;
+    max-width: 74rem;
     margin: 0 auto;
     padding: 22px 18px 40px;
   }
