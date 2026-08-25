@@ -506,18 +506,12 @@ export const CSS = `
     .mb-share-notice { transition: none; }
   }
 
-/* mobius-ui:CenteredRail v1 */
-@media (min-width: 900px) {
-  .mb-root {
-    background:
-      linear-gradient(var(--bg), var(--bg)) center / min(100%, 74rem) 100% no-repeat,
-      radial-gradient(ellipse 76% 112% at 50% 46%,
-        color-mix(in srgb, var(--accent) 18%, var(--bg)) 0%,
-        color-mix(in srgb, var(--accent) 7%, var(--bg)) 46%,
-        color-mix(in srgb, var(--text) 2%, var(--bg)) 100%);
+  /* Centered application rail: the app stays flat while Möbius owns the
+     surrounding canvas. On phone widths the rail naturally fills the view. */
+  @media (min-width: 900px) {
+    .mb-root {
 
+    }
+    .mb-library-header { width: min(100%, 74rem); margin-inline: auto; }
   }
-  .mb-library-header { width: min(100%, 74rem); margin-inline: auto; }
-}
-/* /mobius-ui:CenteredRail */
 `
