@@ -14,9 +14,7 @@ export const CSS = `
     position: relative;
     overflow: hidden;
     color: var(--text);
-    background:
-      radial-gradient(circle at 90% -10%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 34%),
-      var(--bg);
+    background: var(--bg);
     font-family: var(--font);
   }
 
@@ -222,10 +220,18 @@ export const CSS = `
     align-items: center;
     gap: 12px;
     flex: none;
-    padding: 14px 20px;
+    padding: 0;
     border-bottom: 1px solid var(--border);
-    background: color-mix(in srgb, var(--bg) 94%, transparent);
-    backdrop-filter: blur(18px);
+    background: var(--bg);
+  }
+  .mb-library-header-inner {
+    width: 100%;
+    max-width: 74rem;
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
   }
   .mb-library-mark {
     width: 44px;
@@ -233,6 +239,8 @@ export const CSS = `
     flex: none;
   }
   .mb-library-mark img { width: 100%; height: 100%; object-fit: contain; }
+  .mb-library-mark-fallback { width: 44px; height: 44px; place-items: center; border-radius: 11px;
+    background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 750; }
   .mb-library-header h1 {
     margin: 0;
     color: var(--text);
@@ -253,7 +261,8 @@ export const CSS = `
     -webkit-overflow-scrolling: touch;
   }
   .mb-library-page {
-    width: min(760px, 100%);
+    width: 100%;
+    max-width: 74rem;
     margin: 0 auto;
     padding: 22px 18px 40px;
   }
@@ -476,7 +485,8 @@ export const CSS = `
   .mb-loading { gap: 10px; color: var(--muted); font-size: 13px; }
 
   @media (max-width: 720px) {
-    .mb-library-header { min-height: 70px; padding: 12px 16px; }
+    .mb-library-header { min-height: 70px; }
+    .mb-library-header-inner { padding: 12px 16px; }
     .mb-library-mark { width: 42px; height: 42px; }
     .mb-library-page { padding: 17px 12px 32px; }
     .mb-skill-note { margin-bottom: 20px; }
@@ -494,5 +504,14 @@ export const CSS = `
 
   @media (prefers-reduced-motion: reduce) {
     .mb-share-notice { transition: none; }
+  }
+
+  /* Centered application rail: the app stays flat while Möbius owns the
+     surrounding canvas. On phone widths the rail naturally fills the view. */
+  @media (min-width: 900px) {
+    .mb-root {
+
+    }
+    .mb-library-header { width: min(100%, 74rem); margin-inline: auto; }
   }
 `
