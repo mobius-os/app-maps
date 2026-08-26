@@ -221,7 +221,6 @@ export const CSS = `
     gap: 12px;
     flex: none;
     padding: 0;
-    border-bottom: 1px solid var(--border);
     background: var(--bg);
   }
   .mb-library-header-inner {
@@ -232,6 +231,7 @@ export const CSS = `
     align-items: center;
     gap: 12px;
     padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
   }
   .mb-library-mark {
     width: 44px;
