@@ -221,10 +221,10 @@ export const CSS = `
     gap: 12px;
     flex: none;
     padding: 0;
-    border-bottom: 1px solid var(--border);
     background: var(--bg);
   }
   .mb-library-header-inner {
+    position: relative;
     width: 100%;
     max-width: 74rem;
     margin-inline: auto;
@@ -232,6 +232,10 @@ export const CSS = `
     align-items: center;
     gap: 12px;
     padding: 14px 18px;
+  }
+  .mb-library-header-inner::after {
+    content: ''; position: absolute; inset-inline: 18px; bottom: 0;
+    height: 1px; background: var(--border);
   }
   .mb-library-mark {
     width: 44px;
@@ -487,6 +491,7 @@ export const CSS = `
   @media (max-width: 720px) {
     .mb-library-header { min-height: 70px; }
     .mb-library-header-inner { padding: 12px 16px; }
+    .mb-library-header-inner::after { inset-inline: 16px; }
     .mb-library-mark { width: 42px; height: 42px; }
     .mb-library-page { padding: 17px 12px 32px; }
     .mb-skill-note { margin-bottom: 20px; }
