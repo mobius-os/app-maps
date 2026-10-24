@@ -4,6 +4,10 @@ export function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
 }
 
+export function placesLabel(count) {
+  return `${count} ${count === 1 ? 'place' : 'places'}`
+}
+
 function isCoordinateOnlyMapsSearch(value) {
   try {
     const query = new URL(value).searchParams.get('query') || ''

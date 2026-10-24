@@ -358,22 +358,10 @@ export const CSS = `
     background: var(--mb-coral);
     box-shadow: 0 2px 6px rgba(24, 50, 45, .35);
   }
-  .mb-preview-count,
   .mb-preview-credit {
     position: absolute;
     z-index: 4;
     line-height: 1;
-  }
-  .mb-preview-count {
-    left: 10px;
-    top: 10px;
-    padding: 6px 8px;
-    border-radius: 999px;
-    color: #17332d;
-    background: rgba(255,255,255,.9);
-    box-shadow: 0 3px 10px rgba(24, 50, 45, .12);
-    font-size: 10px;
-    font-weight: 850;
   }
   .mb-preview-credit {
     right: 6px;

@@ -7,6 +7,7 @@ import {
 import {
   clamp,
   mapPointToPixel,
+  placesLabel,
   tileRangeForViewport,
 } from './domain.js'
 import { subscribeToMapLibrary } from './storage.js'
@@ -179,7 +180,6 @@ function MapPreview({ record, token, paused }) {
         const point = mapPointToPixel(place, record.center, previewZoom, size)
         return <i className="mb-preview-pin" key={place.id} style={{ left: point.x, top: point.y }} />
       })}
-      <span className="mb-preview-count">{record.places.length} places</span>
       <span className="mb-preview-credit">© OpenStreetMap</span>
     </span>
   )
@@ -197,7 +197,7 @@ function MapCard({ record, token, previewPaused, onSelect }) {
       <span className="mb-map-card-copy">
         <strong>{record.title}</strong>
         {record.subtitle && <span>{record.subtitle}</span>}
-        <small>{cardDate(created)} · {record.area} · {record.places.length} places</small>
+        <small>{cardDate(created)} · {record.area} · {placesLabel(record.places.length)}</small>
       </span>
       <ChevronRight width={18} height={18} aria-hidden="true" />
     </button>
@@ -238,7 +238,7 @@ function MapLibrary({ appId, maps, token, onOpen }) {
         </span>
         <div>
           <h1>Maps</h1>
-          <p>{maps.length} {maps.length === 1 ? 'map' : 'maps'} · {placeCount} places · {areaCount} {areaCount === 1 ? 'area' : 'areas'}</p>
+          <p>{maps.length} {maps.length === 1 ? 'map' : 'maps'} · {placesLabel(placeCount)} · {areaCount} {areaCount === 1 ? 'area' : 'areas'}</p>
         </div>
         </div>
       </header>
