@@ -1,4 +1,5 @@
 import { PUBLIC_VIEWER_ASSETS } from './viewerAssets.js'
+import { placesLabel } from './domain.js'
 import {
   LINK_PREVIEW_FILENAME,
   LINK_PREVIEW_HEIGHT,
@@ -60,7 +61,7 @@ export function buildPublicMapHtml(record, { appId, publicUrl } = {}) {
   }
   const title = escapeHtml(record.title)
   const subtitle = escapeHtml(
-    record.subtitle || `${record.places.length} places in ${record.area}`,
+    record.subtitle || `${placesLabel(record.places.length)} in ${record.area}`,
   )
   const assetRoot = `/app-assets/by-id/${encodeURIComponent(String(appId))}`
   const data = safeJson(record)

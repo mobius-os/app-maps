@@ -123,6 +123,15 @@ test('an existing publication is recovered from the platform token hint', async 
   )
 })
 
+test('the fallback page description counts a single place correctly', () => {
+  const html = buildPublicMapHtml({ ...record, subtitle: '' }, {
+    appId: 101,
+    publicUrl: 'https://mobius.test/sites/abc123/',
+  })
+
+  assert.match(html, /property="og:description" content="1 place in Borough Market"/)
+})
+
 test('invalid publication hints never become public links', () => {
   assert.equal(publishedMapFromToken(record, '../not-a-token'), null)
 })

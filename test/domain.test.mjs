@@ -4,6 +4,7 @@ import assert from 'node:assert/strict'
 import {
   googleMapsPlaceUrl,
   mapPointToPixel,
+  placesLabel,
 } from '../domain.js'
 
 test('map preview projection keeps the center centered and east to the right', () => {
@@ -60,4 +61,10 @@ test('exact place links win while old coordinate searches are upgraded', () => {
     }),
     /^https:\/\/www\.google\.com\/maps\/search\//,
   )
+})
+
+test('place counts read naturally in the singular and plural', () => {
+  assert.equal(placesLabel(0), '0 places')
+  assert.equal(placesLabel(1), '1 place')
+  assert.equal(placesLabel(2), '2 places')
 })
